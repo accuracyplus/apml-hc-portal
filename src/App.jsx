@@ -3,9 +3,9 @@
 
 import { useState } from "react";
 import { T } from "./i18n.js";
-import BookingForm    from "./views/BookingForm.jsx";
-import BookingConfirm from "./views/BookingConfirm.jsx";
-import StatusTracker  from "./views/StatusTracker.jsx";
+import BookingForm    from "../views/BookingForm.jsx";
+import BookingConfirm from "../views/BookingConfirm.jsx";
+import StatusTracker  from "../views/StatusTracker.jsx";
 
 const WORKER = import.meta.env.VITE_WORKER_URL ?? "https://apml-tracker.sinusuresh.workers.dev";
 export { WORKER };
