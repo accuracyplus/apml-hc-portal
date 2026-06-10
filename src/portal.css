@@ -68,7 +68,7 @@ html, body {
 
 /* ── Hero strip — lavender gradient ───────────────────────────────────────── */
 .portal-hero {
-  background: linear-gradient(135deg, #6C5CE7 0%, #8B7CF8 100%);
+  background: linear-gradient(135deg, var(--sky) 0%, #8B7CF8 100%);
 }
 
 /* ── Pills ─────────────────────────────────────────────────────────────────── */
