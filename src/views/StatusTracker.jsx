@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import { WORKER } from "../App.jsx";
 import { STATUS_ORDER, STATUS_BG } from "../i18n.js";
-import StatusIllustration from "../components/StatusIllustration.jsx";
+import StatusIllustration from "../src/components/StatusIllustration.jsx";
 
 const APML_PHONE = "tel:+97124XXXXXX"; // replace with APML lab number
 
