@@ -157,8 +157,13 @@ export default function StatusTracker({ lang, t, tObj: tObjProp }) {
 
   const isRtl = lang === "ar";
 
-  const normalizePhone = p =>
-    p.trim().replace(/\s/g, "").replace(/^\+/, "").replace(/^00/, "");
+  const normalizePhone = raw => {
+    const digits = raw.trim().replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("971")) return digits;
+    if (digits.startsWith("0"))   return "971" + digits.slice(1);
+    return "971" + digits;
+  };
 
   const track = async () => {
     const p = normalizePhone(phone);
