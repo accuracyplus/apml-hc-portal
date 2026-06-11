@@ -3,7 +3,7 @@
 // Countdown fixed — handles HH:MM strings correctly.
 
 import { useState } from "react";
-import { StatusIllustration } from "../components/StatusIllustration.jsx";
+import StatusIllustration from "../components/StatusIllustration.jsx";
 
 const WORKER = import.meta.env.VITE_WORKER_URL ?? "https://apml-tracker.sinusuresh.workers.dev";
 
@@ -184,8 +184,8 @@ export default function StatusTracker({ lang, t }) {
           <>
             <StatusIllustration status={booking.status} lang={lang} t={t} />
 
-            {/* Countdown — shown when Confirmed/Assigned/On the Way */}
-            {["Confirmed", "Assigned", "On the Way"].includes(booking.status) &&
+            {/* Countdown — shown when assigned or on the way */}
+            {["Assigned", "On the Way"].includes(booking.status) &&
               booking.confirmed_date && booking.confirmed_time && (
               <Countdown
                 date={booking.confirmed_date}
