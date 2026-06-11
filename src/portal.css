@@ -72,7 +72,8 @@ html, body { background: #CCFBF1; font-family: var(--font); }
   width: auto; height: auto;
   object-fit: contain; object-position: left center;
   margin-bottom: 4px;
-  filter: brightness(0) invert(1);
+  /* No filter — let logo render as-is. For dark logos on teal header,
+     export a white version of your logo as logo.png */
 }
 
 .brand-text-fallback { margin-bottom: 4px; }
@@ -141,57 +142,90 @@ html, body { background: #CCFBF1; font-family: var(--font); }
 
 /* ── Cards ────────────────────────────────────────────────────────────────── */
 .p-card {
-  background: var(--sky-faint);
+  background: #fff;
   border-radius: var(--r-lg); padding: var(--sp-md);
-  box-shadow: var(--shadow-sm); margin-bottom: 12px;
-  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(15,118,110,0.08), 0 1px 3px rgba(15,118,110,0.05);
+  margin-bottom: 12px;
+  border: 1px solid #D1FAF0;
 }
 
-/* ── Form fields ──────────────────────────────────────────────────────────── */
-.field-group { margin-bottom: 18px; }
+/* ── Form fields — Premium floating design ────────────────────────────────── */
+.field-group {
+  margin-bottom: 20px;
+  position: relative;
+}
 
 .field-label {
-  display: block; font-size: 12px; font-weight: 800;
-  color: var(--sky-dark); text-transform: uppercase;
-  letter-spacing: 0.07em; margin-bottom: 8px;
+  display: block; font-size: 11px; font-weight: 800;
+  color: var(--sky); text-transform: uppercase;
+  letter-spacing: 0.09em; margin-bottom: 6px;
+  transition: color 0.2s;
 }
 .req { color: var(--error); margin-left: 2px; }
 
+/* Input wrapper for icon + field combos */
+.field-wrap {
+  position: relative;
+}
+
 .field-input {
-  width: 100%; padding: 13px 16px; font-size: 15px;
+  width: 100%; padding: 14px 16px; font-size: 15px;
   font-family: var(--font); color: var(--navy);
-  background: var(--sky-faint);
-  border: 2px solid var(--border);
+  background: #fff;
+  border: 1.5px solid #D1FAF0;
   border-radius: var(--r-md); outline: none;
   transition: all 0.2s; -webkit-appearance: none;
   box-sizing: border-box; font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15,118,110,0.06),
+              inset 0 1px 2px rgba(15,118,110,0.04);
 }
 .field-input:focus {
-  border-color: var(--sky); background: #fff;
-  box-shadow: 0 0 0 4px rgba(15,118,110,0.12);
+  border-color: var(--sky);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15,118,110,0.10),
+              0 1px 3px rgba(15,118,110,0.06);
 }
-.field-input.error { border-color: var(--error); box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
-.field-input::placeholder { color: var(--muted); font-weight: 500; }
+.field-input.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
+}
+.field-input::placeholder { color: #A8D5CE; font-weight: 500; }
 .rtl .field-input { text-align: right; }
+
+/* Select fields */
+select.field-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%230F766E' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
 
 /* ── Phone ────────────────────────────────────────────────────────────────── */
 .phone-input-wrap {
   display: flex; border-radius: var(--r-md); overflow: hidden;
-  border: 2px solid var(--border); transition: border-color 0.2s;
+  border: 1.5px solid #D1FAF0;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15,118,110,0.06), inset 0 1px 2px rgba(15,118,110,0.04);
+  transition: all 0.2s;
 }
-.phone-input-wrap:focus-within { border-color: var(--sky); }
+.phone-input-wrap:focus-within {
+  border-color: var(--sky);
+  box-shadow: 0 0 0 4px rgba(15,118,110,0.10), 0 1px 3px rgba(15,118,110,0.06);
+}
 .phone-prefix {
-  padding: 13px 14px;
-  background: linear-gradient(135deg, var(--sky-light), #A7F3D0);
-  font-size: 13px; font-weight: 800; color: var(--sky-dark);
+  padding: 14px 14px;
+  background: linear-gradient(135deg, #CCFBF1 0%, #A7F3D0 100%);
+  font-size: 13px; font-weight: 900; color: var(--sky-dark);
   white-space: nowrap; display: flex; align-items: center;
-  border-right: 2px solid var(--border); flex-shrink: 0;
+  border-right: 1.5px solid #D1FAF0; flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
 .phone-input-field {
   border-radius: 0; flex: 1; border: none;
-  background: var(--sky-faint); box-shadow: none;
+  background: #fff; box-shadow: none;
 }
-.phone-input-field:focus { box-shadow: none; border: none; }
+.phone-input-field:focus { box-shadow: none; border: none; outline: none; }
 
 /* ── Time slot grid ───────────────────────────────────────────────────────── */
 .slot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -200,9 +234,12 @@ html, body { background: #CCFBF1; font-family: var(--font); }
 .slot-btn {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; gap: 3px; padding: 14px 10px;
-  border-radius: var(--r-md); border: 2px solid var(--border);
-  background: var(--sky-faint); cursor: pointer;
-  transition: all 0.18s; font-family: var(--font); min-height: 80px;
+  border-radius: var(--r-md);
+  border: 1.5px solid #D1FAF0;
+  background: #fff;
+  cursor: pointer; transition: all 0.18s;
+  font-family: var(--font); min-height: 80px;
+  box-shadow: 0 1px 3px rgba(15,118,110,0.06);
 }
 .slot-btn .slot-icon  { font-size: 24px; line-height: 1; }
 .slot-btn .slot-label { font-size: 13px; font-weight: 800; color: var(--navy); }
