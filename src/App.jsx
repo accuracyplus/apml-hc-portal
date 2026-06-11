@@ -1,4 +1,4 @@
-// App.jsx — Accuracy Plus Home Collection — Dark Teal
+// App.jsx
 import { useState } from "react";
 import BookingForm    from "./views/BookingForm.jsx";
 import BookingConfirm from "./views/BookingConfirm.jsx";
@@ -10,28 +10,29 @@ export default function App() {
   const [screen,    setScreen]   = useState("book");
   const [confirmed, setConfirmed] = useState(null);
 
-  const t    = key => strings[lang]?.[key] ?? strings.en?.[key] ?? key;
-  const tObj = strings[lang] ?? strings.en;
+  // t as function for our components
+  const t = key => strings[lang]?.[key] ?? strings.en?.[key] ?? key;
+  // Full strings object for StatusIllustration (legacy — expects t[lang][status])
+  const tFull = strings;
 
   const isRtl = lang === "ar";
 
   return (
     <div className={`portal-shell${isRtl ? " rtl" : ""}`}>
 
-      {/* ── Header ──────────────────────────────────────────────────── */}
+      {/* ── Header ──────────────────────────────────────────────── */}
       <header className="portal-header">
-        <div className="brand-block">
-          {/* Text brand — visible until logo.png loads */}
+        <div className="header-top">
+          {/* Fallback brand text, hidden when logo loads */}
           <div className="brand-text-fallback" id="brand-fallback">
             <div className="brand-name">Accuracy Plus</div>
-            <div className="brand-sub">Home Collection</div>
+            <div className="brand-sub">Medical Laboratory</div>
           </div>
-          {/* Upload logo.png (480×150) to portal/public/ */}
+          {/* Upload your logo to portal/public/logo.png */}
           <img
             src="/logo.png"
-            alt="Accuracy Plus Home Collection"
+            alt="Accuracy Plus Medical Laboratory"
             className="portal-logo-banner"
-            style={{ display: "none" }}
             onLoad={e => {
               e.target.style.display = "block";
               const fb = document.getElementById("brand-fallback");
@@ -39,50 +40,54 @@ export default function App() {
             }}
             onError={e => { e.target.style.display = "none"; }}
           />
-          <div className="brand-tagline">Bringing Healthcare Closer to You&hellip;</div>
+
+          {/* Language toggle */}
+          <div className="lang-toggle">
+            {["en","ar"].map(l => (
+              <button key={l} className={`lang-btn${lang === l ? " active" : ""}`}
+                onClick={() => setLang(l)}>
+                {l === "en" ? "EN" : "عربي"}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="lang-toggle">
-          {["en","ar"].map(l => (
-            <button key={l} className={`lang-btn${lang === l ? " active" : ""}`}
-              onClick={() => setLang(l)}>
-              {l === "en" ? "EN" : "عربي"}
-            </button>
-          ))}
+        <div className="header-badge-row">
+          <span className="hc-badge">Home Collection</span>
+          <span className="hc-tagline">Bringing Healthcare Closer to You…</span>
         </div>
       </header>
 
-      {/* ── Tabs ────────────────────────────────────────────────────── */}
+      {/* ── Tabs ────────────────────────────────────────────────── */}
       {screen !== "confirm" && (
-        <nav className="screen-tabs">
+        <div className="screen-tabs">
           <button className={`screen-tab${screen === "book"  ? " active" : ""}`}
             onClick={() => setScreen("book")}>
-            {t("tabRequest")}
+            Request
           </button>
           <button className={`screen-tab${screen === "track" ? " active" : ""}`}
             onClick={() => setScreen("track")}>
-            {t("tabTrack")}
+            Track
           </button>
-        </nav>
+        </div>
       )}
 
-      {/* ── Screens ─────────────────────────────────────────────────── */}
-      {screen === "book"    && (
-        <BookingForm lang={lang} t={t} onBooked={b => { setConfirmed(b); setScreen("confirm"); }} />
+      {/* ── Screens ─────────────────────────────────────────────── */}
+      {screen === "book" && (
+        <BookingForm lang={lang} t={t}
+          onBooked={b => { setConfirmed(b); setScreen("confirm"); }} />
       )}
       {screen === "confirm" && (
-        <BookingConfirm lang={lang} t={tObj} booking={confirmed}
+        <BookingConfirm lang={lang} t={tFull} booking={confirmed}
           onTrack={() => setScreen("track")}
-          onNew={() => setScreen("book")} />
+          onNew={()  => setScreen("book")} />
       )}
       {screen === "track" && (
-        <StatusTracker lang={lang} t={t} tObj={tObj} />
+        <StatusTracker lang={lang} t={t} tFull={tFull} />
       )}
 
-      {/* ── Footer ──────────────────────────────────────────────────── */}
       <footer className="portal-footer">
-        <div>© {new Date().getFullYear()} Accuracy Plus Medical Laboratory</div>
-        <div style={{ marginTop: 4, opacity: 0.65 }}>Licensed · DHA Accredited · ISO Certified</div>
+        © {new Date().getFullYear()} Accuracy Plus Medical Laboratory · DHA Licensed
       </footer>
     </div>
   );
