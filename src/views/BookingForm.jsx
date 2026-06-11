@@ -45,7 +45,7 @@ const blank = () => ({
   tests_required: "", notes: "", location_pin: "",
 });
 
-export function BookingForm({ lang, t, onBooked }) {
+export default function BookingForm({ lang, t, onBooked }) {
   const [form,    setForm]    = useState(blank);
   const [errs,    setErrs]    = useState({});
   const [busy,    setBusy]    = useState(false);
