@@ -2,9 +2,9 @@
 // Premium, easy-to-use design. Logo banner + tagline + two clean screens.
 
 import { useState } from "react";
-import { BookingForm }   from "./views/BookingForm.jsx";
-import { BookingConfirm } from "./views/BookingConfirm.jsx";
-import { StatusTracker }  from "./views/StatusTracker.jsx";
+import BookingForm    from "./views/BookingForm.jsx";
+import BookingConfirm from "./views/BookingConfirm.jsx";
+import StatusTracker  from "./views/StatusTracker.jsx";
 import { t as translate } from "./i18n.js";
 
 export default function App() {
