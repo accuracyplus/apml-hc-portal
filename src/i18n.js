@@ -134,4 +134,16 @@ export function t(key, lang = "en") {
   return strings[lang]?.[key] ?? strings.en?.[key] ?? key;
 }
 
+// Background colours used by StatusIllustration.jsx
+export const STATUS_BG = {
+  "Requested":    "#E0F2FE",
+  "Confirmed":    "#DCFCE7",
+  "Assigned":     "#EDE9FF",
+  "On the Way":   "#FEF3C7",
+  "Collected":    "#CCFBF1",
+  "Processing":   "#DBEAFE",
+  "Report Ready": "#FEF9C3",
+  "Cancelled":    "#F1F5F9",
+};
+
 export default strings;
