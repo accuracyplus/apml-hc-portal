@@ -184,8 +184,8 @@ export default function StatusTracker({ lang, t }) {
           <>
             <StatusIllustration status={booking.status} lang={lang} t={t} />
 
-            {/* Countdown — shown when assigned or on the way */}
-            {["Assigned", "On the Way"].includes(booking.status) &&
+            {/* Countdown — shown when Confirmed/Assigned/On the Way */}
+            {["Confirmed", "Assigned", "On the Way"].includes(booking.status) &&
               booking.confirmed_date && booking.confirmed_time && (
               <Countdown
                 date={booking.confirmed_date}
