@@ -92,19 +92,19 @@
         )}
   
         {/* ══ SCREENS ══════════════════════════════════════════════════ */}
-        {screen === "book" && (
-          <BookingForm
-            lang={lang}
-            t={t}
-            onBooked={b => { setConfirmed(b); setScreen("confirm"); }}
-          />
-        )}
-  
-        {screen === "track" && (
+      {screen === "book" && (
+        <BookingForm
+          lang={lang}
+          t={t}
+          onBooked={b => { setConfirmed(b); setScreen("confirm"); }}
+        />
+      )}
+
+      {/* passed but StatusTracker now uses internal STATUS_CONFIG */}
+      {screen === "track" && (
         <StatusTracker
           lang={lang}
           t={t}
-          {/* passed but StatusTracker now uses internal STATUS_CONFIG */}
           tFull={tFull}
         />
       )}
