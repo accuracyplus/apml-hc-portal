@@ -170,6 +170,7 @@ export default function BookingForm({ lang, t, onBooked }) {
   const [apiErr,  setApiErr]  = useState("");
   const [locBusy, setLocBusy] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [consent, setConsent] = useState(false);
   const isRtl = lang === "ar";
 
   const set = (k, v) => {
@@ -209,6 +210,7 @@ export default function BookingForm({ lang, t, onBooked }) {
     if (!form.contact_number.trim()) e.contact_number = "Required";
     if (!form.preferred_date) e.preferred_date = "Required";
     if (!form.time_slot) e.time_slot = "Please select a time";
+    if (!consent) e.consent = "Please accept the privacy notice to continue";
     if (form.preferred_date && form.preferred_date < todayISO())
       e.preferred_date = "Please select today or a future date";
     setErrs(e);
@@ -375,8 +377,29 @@ export default function BookingForm({ lang, t, onBooked }) {
           </div>
         </div>
 
-        <div className="disclaimer">
-          Your information is kept private and used only for your appointment.
+        {/* Consent / privacy notice — required before submission */}
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+            <input type="checkbox" checked={consent} onChange={e => {
+              setConsent(e.target.checked);
+              setErrs(ev => ({ ...ev, consent: "" }));
+            }}
+              style={{ marginTop: 3, width: 16, height: 16, accentColor: "var(--teal)",
+                flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: "var(--text-mid)", lineHeight: 1.6 }}>
+              I confirm that I have read and agree to the{" "}
+              <a href="/privacy" target="_blank" rel="noreferrer"
+                style={{ color: "var(--teal)", fontWeight: 700 }}>
+                Privacy Notice
+              </a>
+              . My personal information (name, mobile, date of birth, location) will be
+              used solely to process this home collection appointment and will not be
+              shared with third parties. <em>(Required under UAE PDPL)</em>
+            </span>
+          </label>
+          {errs.consent && (
+            <div className="field-error" style={{ marginTop: 4 }}>{errs.consent}</div>
+          )}
         </div>
 
         <button className="btn-primary" onClick={submit} disabled={busy}>
