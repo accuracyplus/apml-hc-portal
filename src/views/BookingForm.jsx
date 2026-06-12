@@ -1,4 +1,4 @@
-// portal/src/views/BookingForm.jsx — premium with all improvements
+// portal/src/views/BookingForm.jsx — v4 — claymorphism · teal header · no area
 import { useState, useEffect, useRef } from "react";
 
 const WORKER = import.meta.env.VITE_WORKER_URL ?? "https://apml-tracker.sinusuresh.workers.dev";
@@ -16,17 +16,15 @@ const uaeHour = () => {
   } catch { return new Date().getHours(); }
 };
 
-// Generate 30-min intervals 6:00–20:00
 const buildTimeOptions = () => {
   const opts = [];
   for (let h = 6; h < 20; h++) {
     for (const m of [0, 30]) {
-      const hh   = String(h).padStart(2, "0");
-      const mm   = String(m).padStart(2, "0");
-      const h12  = h > 12 ? h - 12 : h === 0 ? 12 : h;
+      const hh  = String(h).padStart(2, "0");
+      const mm  = String(m).padStart(2, "0");
+      const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
       const ampm = h >= 12 ? "PM" : "AM";
-      const label = `${h12}:${mm} ${ampm}`;
-      opts.push({ value: `${hh}:${mm}`, label, h });
+      opts.push({ value: `${hh}:${mm}`, label: `${h12}:${mm} ${ampm}`, h });
     }
   }
   return opts;
@@ -39,10 +37,7 @@ const getAvailableTimes = date => {
   return ALL_TIME_OPTIONS.filter(o => o.h > h);
 };
 
-const parsePhone = raw => {
-  const digits = String(raw || "").replace(/\D/g, "");
-  return digits || "";
-};
+const parsePhone = raw => String(raw || "").replace(/\D/g, "");
 
 const blank = () => ({
   patient_name: "", contact_code: "971", contact_number: "",
@@ -50,13 +45,13 @@ const blank = () => ({
   tests_required: "", notes: "", location_pin: "",
 });
 
-// ── Draggable Leaflet Map ─────────────────────────────────────────────────
+// ── Draggable Leaflet Map ──────────────────────────────────────────────────
 function DraggableMap({ value, onChange }) {
   const containerRef = useRef(null);
   const mapRef       = useRef(null);
   const markerRef    = useRef(null);
 
-  const defaultLat = 24.4539, defaultLng = 54.3773; // Abu Dhabi
+  const defaultLat = 24.4539, defaultLng = 54.3773;
   const [lat, lng] = value
     ? value.split(",").map(Number)
     : [defaultLat, defaultLng];
@@ -73,17 +68,13 @@ function DraggableMap({ value, onChange }) {
         zoomControl: true, attributionControl: false,
       });
       mapRef.current = map;
-
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-      // Custom teal pin
       const icon = L.divIcon({
-        html: `<div style="
-          width:22px;height:22px;border-radius:50% 50% 50% 0;
-          background:linear-gradient(135deg,#3C7871,#5B9090);
-          border:3px solid white;box-shadow:0 3px 10px rgba(60,120,113,0.5);
-          transform:rotate(-45deg);
-        "></div>`,
+        html: "<div style=\"width:22px;height:22px;border-radius:50% 50% 50% 0;"
+          + "background:linear-gradient(135deg,#3C7871,#5B9090);"
+          + "border:3px solid white;box-shadow:0 3px 10px rgba(60,120,113,0.5);"
+          + "transform:rotate(-45deg);\"></div>",
         className: "", iconSize: [22, 22], iconAnchor: [11, 22],
       });
 
@@ -92,16 +83,14 @@ function DraggableMap({ value, onChange }) {
 
       marker.on("dragend", () => {
         const pos = marker.getLatLng();
-        onChange(`${pos.lat.toFixed(6)},${pos.lng.toFixed(6)}`);
+        onChange(pos.lat.toFixed(6) + "," + pos.lng.toFixed(6));
       });
-
       map.on("click", e => {
         marker.setLatLng(e.latlng);
-        onChange(`${e.latlng.lat.toFixed(6)},${e.latlng.lng.toFixed(6)}`);
+        onChange(e.latlng.lat.toFixed(6) + "," + e.latlng.lng.toFixed(6));
       });
     };
 
-    // Load Leaflet if needed
     if (window.L) {
       initMap();
     } else {
@@ -118,17 +107,11 @@ function DraggableMap({ value, onChange }) {
         document.head.appendChild(script);
       }
     }
-
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
+      if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; markerRef.current = null; }
     };
   }, []); // eslint-disable-line
 
-  // Sync marker when value changes (e.g. GPS capture)
   useEffect(() => {
     if (!value || !markerRef.current || !mapRef.current) return;
     const [newLat, newLng] = value.split(",").map(Number);
@@ -139,22 +122,25 @@ function DraggableMap({ value, onChange }) {
   }, [value]);
 
   return (
-    <div style={{ marginTop: 10, borderRadius: 16, overflow: "hidden",
-      border: "1.5px solid rgba(60,120,113,0.2)",
-      boxShadow: "0 4px 16px rgba(60,120,113,0.12)" }}>
-      <div ref={containerRef} style={{ height: 220, display: "block" }} />
-      <div style={{ padding: "8px 14px",
-        background: "linear-gradient(135deg, rgba(60,120,113,0.08), rgba(91,144,144,0.05))",
+    <div style={{
+      marginTop: 12, borderRadius: "var(--r-md)", overflow: "hidden",
+      border: "1px solid var(--border)",
+      boxShadow: "0 4px 16px rgba(60,120,113,0.10)",
+    }}>
+      <div ref={containerRef} style={{ height: 200 }} />
+      <div style={{
+        padding: "8px 14px",
+        background: "linear-gradient(135deg,rgba(60,120,113,0.06),rgba(91,144,144,0.03))",
         display: "flex", justifyContent: "space-between", alignItems: "center",
-        borderTop: "1px solid rgba(60,120,113,0.12)" }}>
+        borderTop: "1px solid rgba(60,120,113,0.10)",
+      }}>
         <span style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
-          📌 Drag pin or tap map to adjust location
+          📌 Drag pin or tap map to adjust
         </span>
         {value && (
-          <a href={`https://maps.google.com/?q=${value}`}
+          <a href={"https://maps.google.com/?q=" + value}
             target="_blank" rel="noreferrer"
-            style={{ fontSize: 11, color: "var(--teal)", fontWeight: 800,
-              textDecoration: "none", marginLeft: 8 }}>
+            style={{ fontSize: 11, color: "var(--teal)", fontWeight: 800, textDecoration: "none" }}>
             Maps ↗
           </a>
         )}
@@ -194,7 +180,7 @@ export default function BookingForm({ lang, t, onBooked }) {
     setLocBusy(true);
     navigator.geolocation.getCurrentPosition(
       pos => {
-        const pin = `${pos.coords.latitude.toFixed(6)},${pos.coords.longitude.toFixed(6)}`;
+        const pin = pos.coords.latitude.toFixed(6) + "," + pos.coords.longitude.toFixed(6);
         set("location_pin", pin);
         setShowMap(true);
         setLocBusy(false);
@@ -250,27 +236,51 @@ export default function BookingForm({ lang, t, onBooked }) {
   const availTimes = getAvailableTimes(form.preferred_date);
 
   return (
-    <div className={`portal-page${isRtl ? " rtl" : " ltr"}`}>
-      <div className="form-body">
-        {apiErr && <div className="error-msg">{apiErr}</div>}
+    <div className={isRtl ? "rtl" : "ltr"} style={{ minHeight: "100dvh" }}>
 
-        <div className="form-title">Request an Appointment</div>
-        <div className="form-subtitle">Book a home sample collection in minutes.</div>
+      {/* ── Teal Hero Header ──────────────────────────────────────────── */}
+      <div style={{
+        background: "linear-gradient(135deg, var(--teal-900) 0%, var(--teal-700) 55%, var(--teal-500) 100%)",
+        padding: "max(52px, calc(env(safe-area-inset-top, 0px) + 36px)) var(--sp-10) var(--sp-10)",
+        boxShadow: "0 6px 32px rgba(27,77,71,0.28)",
+      }}>
+        <div style={{ marginBottom: 6 }}>
+          <span className="hc-badge">Home Collection</span>
+        </div>
+        <h1 style={{
+          margin: 0, fontSize: 28, fontWeight: 900, color: "#fff",
+          letterSpacing: "-0.02em", lineHeight: 1.15,
+        }}>Book a Sample Collection</h1>
+        <p style={{
+          margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,0.72)",
+          fontWeight: 500, lineHeight: 1.5,
+        }}>
+          We&apos;ll come to you — fast, safe, at-home testing.
+        </p>
+      </div>
 
-        {/* ── YOUR DETAILS ────────────────────────────── */}
+      {/* ── Form Body ─────────────────────────────────────────────────── */}
+      <div style={{ padding: "var(--sp-8) var(--sp-8) calc(var(--sp-12) + env(safe-area-inset-bottom, 0px))" }}>
+
+        {apiErr && (
+          <div className="error-msg" style={{ marginBottom: "var(--sp-8)" }}>{apiErr}</div>
+        )}
+
+        {/* YOUR DETAILS */}
         <div className="section-block">
           <div className="section-label">Your Details</div>
 
           <div className="field-group">
             <label className="field-label">Full Name</label>
-            <input className={`field-input${errs.patient_name ? " error" : ""}`}
+            <input
+              className={"field-input" + (errs.patient_name ? " error" : "")}
               value={form.patient_name}
               placeholder="Enter your full name"
-              onChange={e => set("patient_name", e.target.value)} />
+              onChange={e => set("patient_name", e.target.value)}
+            />
             {errs.patient_name && <div className="field-error">{errs.patient_name}</div>}
           </div>
 
-          {/* Mobile — editable code */}
           <div className="field-group">
             <label className="field-label">Mobile Number</label>
             <div className="phone-wrap">
@@ -280,88 +290,105 @@ export default function BookingForm({ lang, t, onBooked }) {
                 value={form.contact_code}
                 maxLength={4}
                 onChange={e => set("contact_code", e.target.value.replace(/\D/g, ""))}
-                title="Country code (editable)"
+                title="Country code"
               />
-              <input className="phone-number" type="tel"
+              <input
+                className="phone-number"
+                type="tel"
                 value={form.contact_number}
                 placeholder="50 123 4567"
-                onChange={e => set("contact_number", e.target.value.replace(/\D/g, ""))} />
+                onChange={e => set("contact_number", e.target.value.replace(/\D/g, ""))}
+              />
             </div>
             {errs.contact_number && <div className="field-error">{errs.contact_number}</div>}
           </div>
 
           <div className="field-group">
-            <label className="field-label">Date of Birth</label>
+            <label className="field-label">
+              Date of Birth <span className="field-label-optional">· optional</span>
+            </label>
             <input className="field-input" type="date" value={form.dob}
               onChange={e => set("dob", e.target.value)} />
           </div>
         </div>
 
-        {/* ── SCHEDULE ────────────────────────────────── */}
+        {/* SCHEDULE */}
         <div className="section-block">
           <div className="section-label">Schedule</div>
 
           <div className="field-row">
             <div className="field-group">
               <label className="field-label">Preferred Date</label>
-              <input className={`field-input${errs.preferred_date ? " error" : ""}`}
+              <input
+                className={"field-input" + (errs.preferred_date ? " error" : "")}
                 type="date" value={form.preferred_date} min={todayISO()}
-                onChange={e => { if (e.target.value >= todayISO()) set("preferred_date", e.target.value); }} />
-              {errs.preferred_date && <div className="field-error" style={{ fontSize: 10 }}>{errs.preferred_date}</div>}
+                onChange={e => { if (e.target.value >= todayISO()) set("preferred_date", e.target.value); }}
+              />
+              {errs.preferred_date && (
+                <div className="field-error" style={{ fontSize: 10 }}>{errs.preferred_date}</div>
+              )}
             </div>
 
             <div className="field-group">
               <label className="field-label">Time</label>
-              <select className={`field-input${errs.time_slot ? " error" : ""}`}
+              <select
+                className={"field-input" + (errs.time_slot ? " error" : "")}
                 value={form.time_slot}
-                onChange={e => set("time_slot", e.target.value)}>
+                onChange={e => set("time_slot", e.target.value)}
+              >
                 <option value="">Select…</option>
                 {availTimes.map(o => (
                   <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
-                {availTimes.length === 0 && (
-                  <option disabled>No slots today</option>
-                )}
+                {availTimes.length === 0 && <option disabled>No slots today</option>}
               </select>
-              {errs.time_slot && <div className="field-error" style={{ fontSize: 10 }}>{errs.time_slot}</div>}
+              {errs.time_slot && (
+                <div className="field-error" style={{ fontSize: 10 }}>{errs.time_slot}</div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* ── VISIT DETAILS ────────────────────────────── */}
+        {/* VISIT DETAILS */}
         <div className="section-block">
           <div className="section-label">Visit Details</div>
 
           <div className="field-group">
-            <label className="field-label">Tests Required</label>
+            <label className="field-label">
+              Tests Required <span className="field-label-optional">· optional</span>
+            </label>
             <input className="field-input" value={form.tests_required}
               placeholder="e.g. CBC, Vitamin D, Lipid Profile"
               onChange={e => set("tests_required", e.target.value)} />
           </div>
 
           <div className="field-group">
-            <label className="field-label">Location</label>
+            <label className="field-label">
+              Location <span className="field-label-optional">· optional</span>
+            </label>
             <button
-              className={`location-btn${form.location_pin ? " captured" : ""}`}
-              onClick={captureLocation} disabled={locBusy}>
-              {locBusy ? "📍 Getting your location…"
-                : form.location_pin ? "✅ Location captured — tap to update"
-                : "📍  Use my current location"}
+              className={"location-btn" + (form.location_pin ? " captured" : "")}
+              onClick={captureLocation} disabled={locBusy}
+              type="button"
+            >
+              {locBusy
+                ? "📍 Getting your location…"
+                : form.location_pin
+                  ? "✅ Location captured — tap to update"
+                  : "📍  Use my current location"}
             </button>
             {errs.location && <div className="field-error">{errs.location}</div>}
 
-            {/* Draggable map */}
             {showMap && form.location_pin && (
-              <DraggableMap
-                value={form.location_pin}
-                onChange={pin => set("location_pin", pin)}
-              />
+              <DraggableMap value={form.location_pin} onChange={pin => set("location_pin", pin)} />
             )}
             {form.location_pin && !showMap && (
-              <button onClick={() => setShowMap(true)}
-                style={{ marginTop: 8, background: "none", border: "none",
+              <button type="button" onClick={() => setShowMap(true)}
+                style={{
+                  marginTop: 8, background: "none", border: "none",
                   color: "var(--teal)", fontSize: 12, fontWeight: 700,
-                  cursor: "pointer", fontFamily: "var(--font)", padding: 0 }}>
+                  cursor: "pointer", fontFamily: "var(--font)", padding: 0,
+                }}>
                 📍 View / adjust on map →
               </button>
             )}
@@ -372,29 +399,27 @@ export default function BookingForm({ lang, t, onBooked }) {
               Notes <span className="field-label-optional">· optional</span>
             </label>
             <input className="field-input" value={form.notes}
-              placeholder="Gate code, building, floor..."
+              placeholder="Gate code, building, floor…"
               onChange={e => set("notes", e.target.value)} />
           </div>
         </div>
 
-        {/* Consent / privacy notice — required before submission */}
-        <div style={{ marginBottom: 12 }}>
+        {/* CONSENT */}
+        <div style={{ marginBottom: "var(--sp-8)" }}>
           <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
-            <input type="checkbox" checked={consent} onChange={e => {
-              setConsent(e.target.checked);
-              setErrs(ev => ({ ...ev, consent: "" }));
-            }}
-              style={{ marginTop: 3, width: 16, height: 16, accentColor: "var(--teal)",
-                flexShrink: 0 }} />
+            <input
+              type="checkbox" checked={consent}
+              onChange={e => { setConsent(e.target.checked); setErrs(ev => ({ ...ev, consent: "" })); }}
+              style={{ marginTop: 3, width: 16, height: 16, accentColor: "var(--teal)", flexShrink: 0 }}
+            />
             <span style={{ fontSize: 12, color: "var(--text-mid)", lineHeight: 1.6 }}>
               I confirm that I have read and agree to the{" "}
               <a href="/privacy" target="_blank" rel="noreferrer"
                 style={{ color: "var(--teal)", fontWeight: 700 }}>
                 Privacy Notice
               </a>
-              . My personal information (name, mobile, date of birth, location) will be
-              used solely to process this home collection appointment and will not be
-              shared with third parties. <em>(Required under UAE PDPL)</em>
+              . My personal information will be used solely to process this home collection
+              appointment. <em>(Required under UAE PDPL)</em>
             </span>
           </label>
           {errs.consent && (
@@ -402,9 +427,13 @@ export default function BookingForm({ lang, t, onBooked }) {
           )}
         </div>
 
-        <button className="btn-primary" onClick={submit} disabled={busy}>
+        <button className="btn-primary" onClick={submit} disabled={busy} type="button">
           {busy ? "Submitting…" : "Submit Request"}
         </button>
+
+        <p className="disclaimer">
+          APML Home Collection · Abu Dhabi · Licensed by DOH
+        </p>
       </div>
     </div>
   );
