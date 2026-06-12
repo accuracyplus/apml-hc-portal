@@ -577,3 +577,67 @@ select.field-input {
 .anim-sparkle { animation:sparkle  2s   ease-in-out infinite }
 .anim-pulse   { animation:pulse-g  2s   ease-in-out infinite }
 .anim-slide   { animation:slide-up 0.4s ease-out both }
+
+/* â”€â”€ StatusIllustration support â€” append to portal.css â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   These classes are used by StatusIllustration.jsx animated SVG component.
+   .illus-circle already exists for emoji fallback â€” these add SVG support.
+   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+/* Wrapper for the animated SVG illustration */
+.status-illustration {
+  text-align: center;
+  padding: var(--sp-10) var(--sp-10) var(--sp-6);
+}
+
+.illus-wrap {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin: 0 auto var(--sp-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(60,120,113,0.12);
+  overflow: visible;
+}
+
+.illus-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* â”€â”€ Animation classes (portal variants of tracker animations) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+@keyframes portal-bob {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-8px) rotate(2deg); }
+}
+@keyframes portal-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@keyframes portal-drive {
+  0%   { transform: translateX(-6px); }
+  100% { transform: translateX(6px); }
+}
+@keyframes portal-spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes portal-sparkle {
+  0%,100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50%      { transform: scale(1.08) rotate(5deg); opacity: 0.85; }
+}
+
+.anim-bob     { animation: portal-bob      2s   ease-in-out infinite; }
+.anim-float   { animation: portal-float    2.4s ease-in-out infinite; }
+.anim-drive   { animation: portal-drive    0.5s ease-in-out infinite alternate; }
+.anim-spin    { animation: portal-spin-slow 2.5s linear     infinite; }
+.anim-sparkle { animation: portal-sparkle  2s   ease-in-out infinite; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .anim-bob, .anim-float, .anim-drive, .anim-spin, .anim-sparkle {
+    animation: none;
+  }
+}
