@@ -1,5 +1,6 @@
-// portal/src/views/StatusTracker.jsx — DOB tracking, editable code, crash fixed
-import { useState } from "react";
+// portal/src/views/StatusTracker.jsx — v2 — animated illustrations + fixed countdown
+import { useState, useEffect } from "react";
+import StatusIllustration from "../components/StatusIllustration.jsx";
 import strings from "../i18n.js";
 
 const WORKER = import.meta.env.VITE_WORKER_URL ?? "https://apml-tracker.sinusuresh.workers.dev";
@@ -14,17 +15,6 @@ const JOURNEY_STEPS = [
   { key: "Report Ready", icon: "📄", sub: "Delivered to you"         },
 ];
 
-const STATUS_CONFIG = {
-  "Requested":    { emoji: "📋", bg: "#EDF3F1", title: "Request Received",      msg: "We've received your booking and will confirm shortly."          },
-  "Confirmed":    { emoji: "✅", bg: "#DCFCE7", title: "Appointment Confirmed",  msg: "Your appointment is confirmed. We'll be there on time."         },
-  "Assigned":     { emoji: "👤", bg: "#EDE9FF", title: "Collector Assigned",     msg: "A collector has been assigned to your appointment."            },
-  "On the Way":   { emoji: "🚗", bg: "#D6EEEB", title: "On the Way",            msg: "Your collector is heading to your location now."               },
-  "Collected":    { emoji: "🧪", bg: "#CCFBF1", title: "Sample Collected",      msg: "Your sample has been collected and is being analysed."         },
-  "Processing":   { emoji: "🔬", bg: "#DBEAFE", title: "Processing",            msg: "Your sample is being analysed in our laboratory."              },
-  "Report Ready": { emoji: "📄", bg: "#FEF9C3", title: "Report Ready",          msg: "Your report is ready. Please contact us to access it."         },
-  "Cancelled":    { emoji: "✕",  bg: "#FEE2E2", title: "Cancelled",             msg: "This booking has been cancelled."                              },
-};
-
 function stepState(current, key) {
   const order = JOURNEY_STEPS.map(s => s.key);
   const ci = order.indexOf(current);
@@ -37,12 +27,15 @@ function stepState(current, key) {
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
+// FIX: was using useState() instead of useEffect() — interval never started
 function useCountdown(dateStr, timeStr) {
   const [now, setNow] = useState(Date.now());
-  useState(() => {
+
+  useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
-  });
+  }, []);
+
   if (!dateStr || !timeStr || !/^\d{1,2}:\d{2}/.test(timeStr)) return null;
   const target = new Date(`${dateStr}T${timeStr}:00`);
   if (isNaN(target.getTime())) return null;
@@ -56,15 +49,30 @@ function useCountdown(dateStr, timeStr) {
   };
 }
 
-function StatusView({ booking, onBack, onTrackAnother, hasMultiple }) {
-  const cd     = useCountdown(booking.confirmed_date, booking.confirmed_time);
-  const config = STATUS_CONFIG[booking.status] ?? STATUS_CONFIG["Requested"];
-  const driver = booking.driver || booking.phlebotomist || "";
-  const phone  = booking.driver_phone || "";
+// Build the tFull-compatible status object StatusIllustration expects
+// StatusIllustration reads: tFull[status] = { label, msg, anim }
+const STATUS_ILLUS_STRINGS = {
+  "Requested":    { label: "Request Received",     msg: "We've received your booking and will confirm shortly.",         anim: "anim-bob"     },
+  "Confirmed":    { label: "Appointment Confirmed",msg: "Your appointment is confirmed. We'll be there on time.",        anim: "anim-sparkle" },
+  "Assigned":     { label: "Collector Assigned",   msg: "A collector has been assigned to your appointment.",           anim: "anim-float"   },
+  "On the Way":   { label: "On the Way",           msg: "Your collector is heading to your location now.",              anim: "anim-drive"   },
+  "Collected":    { label: "Sample Collected",     msg: "Your sample has been collected and is being analysed.",        anim: "anim-bob"     },
+  "Processing":   { label: "Processing in Lab",    msg: "Your sample is being analysed in our laboratory.",             anim: "anim-spin"    },
+  "Report Ready": { label: "Report Ready",         msg: "Your report is ready. Please contact us to access it.",        anim: "anim-sparkle" },
+  "Cancelled":    { label: "Cancelled",            msg: "This booking has been cancelled.",                             anim: ""             },
+};
 
-  const showCountdown = ["Confirmed","Assigned","On the Way"].includes(booking.status)
+// tFull-shaped object for StatusIllustration ({ statuses: { [status]: { label, msg, anim } } })
+const ILLUS_T = { statuses: STATUS_ILLUS_STRINGS };
+
+function StatusView({ booking, lang, onBack, onTrackAnother }) {
+  const cd = useCountdown(booking.confirmed_date, booking.confirmed_time);
+  const driver = booking.driver || booking.phlebotomist || "";
+  const phone  = booking.driver_phone || booking.phlebotomist_phone || "";
+
+  const showCountdown = ["Confirmed", "Assigned", "On the Way"].includes(booking.status)
     && booking.confirmed_date && booking.confirmed_time;
-  const showCollector = ["Assigned","On the Way","Collected"].includes(booking.status) && driver;
+  const showCollector = ["Assigned", "On the Way", "Collected"].includes(booking.status) && driver;
 
   return (
     <div className="portal-page">
@@ -80,16 +88,10 @@ function StatusView({ booking, onBack, onTrackAnother, hasMultiple }) {
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{booking.id}</span>
       </div>
 
-      {/* Status illustration */}
-      <div className="status-illus">
-        <div className="illus-circle" style={{ background: config.bg }}>
-          {config.emoji}
-        </div>
-        <div className="status-title">{config.title}</div>
-        <div className="status-msg">{config.msg}</div>
-      </div>
+      {/* ── Animated status illustration ─────────────────────────── */}
+      <StatusIllustration status={booking.status} t={ILLUS_T} />
 
-      {/* Countdown */}
+      {/* ── Countdown ────────────────────────────────────────────── */}
       {showCountdown && (
         <div className="countdown-card">
           <div className="countdown-label">Arriving in approximately</div>
@@ -102,7 +104,7 @@ function StatusView({ booking, onBack, onTrackAnother, hasMultiple }) {
         </div>
       )}
 
-      {/* Collector card */}
+      {/* ── Collector card ───────────────────────────────────────── */}
       {showCollector && (
         <div className="collector-card">
           <div className="collector-avatar">👤</div>
@@ -110,20 +112,20 @@ function StatusView({ booking, onBack, onTrackAnother, hasMultiple }) {
             <div className="collector-name">{driver}</div>
             <div className="collector-role">{booking.driver ? "Your Driver" : "Your Collector"}</div>
           </div>
-          {phone && <a href={`tel:${phone}`} className="collector-call">📞</a>}
+          {phone && <a href={"tel:" + phone} className="collector-call">📞</a>}
         </div>
       )}
 
-      {/* Journey card */}
+      {/* ── Journey card ─────────────────────────────────────────── */}
       <div className="journey-card">
         <div className="journey-card-title">Collection Journey</div>
         <div className="journey-steps">
           {JOURNEY_STEPS.map((step, idx) => {
             const state = stepState(booking.status, step.key);
             return (
-              <div key={step.key} className={`j-step ${state}`}
+              <div key={step.key} className={"j-step " + state}
                 style={{ paddingBottom: idx < JOURNEY_STEPS.length - 1 ? 24 : 0 }}>
-                <div className={`j-dot ${state}`}>
+                <div className={"j-dot " + state}>
                   {state === "done"
                     ? <span style={{ color: "#fff", fontSize: 16, fontWeight: 900 }}>✓</span>
                     : <span style={{ fontSize: 20 }}>{step.icon}</span>
@@ -153,21 +155,28 @@ function StatusView({ booking, onBack, onTrackAnother, hasMultiple }) {
   );
 }
 
-export default function StatusTracker({ lang, t, tFull: _tFull }) {
-  const [code,     setCode]     = useState("971");
-  const [phone,    setPhone]    = useState("");
-  const [name,     setName]     = useState("");
-  const [dob,      setDob]      = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [err,      setErr]      = useState("");
-  const [booking,  setBooking]  = useState(null);
-  const [multiple, setMultiple] = useState(null);
+export default function StatusTracker({ lang, t, tFull: _tFull, directBooking }) {
+  const [code,    setCode]    = useState("971");
+  const [phone,   setPhone]   = useState("");
+  const [name,    setName]    = useState("");
+  const [dob,     setDob]     = useState("");
+  const [loading, setLoading] = useState(false);
+  const [err,     setErr]     = useState("");
+  const [booking, setBooking] = useState(null);
+  const [multiple,setMultiple]= useState(null);
+
+  // If a booking was passed directly (post-submit auto-navigate), show it immediately
+  useEffect(() => {
+    if (directBooking) {
+      setBooking(directBooking);
+    }
+  }, [directBooking]);
 
   const normalizePhone = (c, n) => {
-    const code   = String(c || "971").replace(/\D/g, "");
+    const code_  = String(c || "971").replace(/\D/g, "");
     const number = String(n || "").replace(/\D/g, "");
     if (!number) return "";
-    return code + number;
+    return code_ + number;
   };
 
   const track = async () => {
@@ -180,11 +189,9 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
       if (dob) params.set("dob", dob);
       const res  = await fetch(`${WORKER}/hc-status?${params.toString()}`);
       const data = await res.json();
-
       if (!res.ok || !data.ok) {
         setErr("No booking found. Please check your details.");
       } else if (data.multiple && data.bookings?.length > 1) {
-        // Client-side DOB filter if multiple results
         if (dob) {
           const filtered = data.bookings.filter(b => b.dob === dob || !b.dob);
           if (filtered.length === 1) { setBooking(filtered[0]); return; }
@@ -208,11 +215,12 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
       { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   };
 
-  /* ── Single booking ──────────────────────────────────────────────── */
+  /* ── Single booking ──────────────────────────────────────────── */
   if (booking) {
     return (
       <StatusView
         booking={booking}
+        lang={lang}
         hasMultiple={multiple?.length > 1}
         onBack={() => multiple?.length > 1 ? setBooking(null) : reset()}
         onTrackAnother={reset}
@@ -220,7 +228,7 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
     );
   }
 
-  /* ── Multiple — pick date ────────────────────────────────────────── */
+  /* ── Multiple — pick date ────────────────────────────────────── */
   if (multiple) {
     return (
       <div className="portal-page">
@@ -252,7 +260,7 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
     );
   }
 
-  /* ── Search form ─────────────────────────────────────────────────── */
+  /* ── Search form ─────────────────────────────────────────────── */
   return (
     <div className="portal-page">
       <div className="track-hero">
@@ -260,21 +268,16 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
         <div className="track-subtitle">Live status of your home visit.</div>
 
         <div className="track-card">
-          {/* Mobile — editable code */}
+          {/* Mobile */}
           <div>
             <label style={{ fontSize: 11, fontWeight: 800, color: "var(--teal-600)",
-              textTransform: "uppercase", letterSpacing: "0.09em", display: "block",
-              marginBottom: 6 }}>
+              textTransform: "uppercase", letterSpacing: "0.09em", display: "block", marginBottom: 6 }}>
               Mobile Number
             </label>
             <div className="phone-wrap">
-              <input
-                className="phone-code-input"
-                type="tel" value={code} maxLength={4}
-                onChange={e => setCode(e.target.value.replace(/\D/g, ""))}
-                title="Country code" />
-              <input className="phone-number" type="tel"
-                value={phone} placeholder="50 123 4567"
+              <input className="phone-code-input" type="tel" value={code} maxLength={4}
+                onChange={e => setCode(e.target.value.replace(/\D/g, ""))} title="Country code" />
+              <input className="phone-number" type="tel" value={phone} placeholder="50 123 4567"
                 onChange={e => { setPhone(e.target.value.replace(/\D/g,"")); setErr(""); }} />
             </div>
           </div>
@@ -282,23 +285,23 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
           {/* First name */}
           <div>
             <label style={{ fontSize: 11, fontWeight: 800, color: "var(--teal-600)",
-              textTransform: "uppercase", letterSpacing: "0.09em", display: "block",
-              marginBottom: 6 }}>
+              textTransform: "uppercase", letterSpacing: "0.09em", display: "block", marginBottom: 6 }}>
               First Name
             </label>
-            <input className="field-input" value={name}
-              placeholder="Your first name"
+            <input className="field-input" value={name} placeholder="Your first name"
               onChange={e => { setName(e.target.value); setErr(""); }}
               onKeyDown={e => e.key === "Enter" && track()}
               style={{ margin: 0, background: "rgba(255,255,255,0.80)" }} />
           </div>
 
-          {/* Date of birth */}
+          {/* DOB */}
           <div>
             <label style={{ fontSize: 11, fontWeight: 800, color: "var(--teal-600)",
-              textTransform: "uppercase", letterSpacing: "0.09em", display: "block",
-              marginBottom: 6 }}>
-              Date of Birth <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "none" }}>· optional, helps narrow results</span>
+              textTransform: "uppercase", letterSpacing: "0.09em", display: "block", marginBottom: 6 }}>
+              Date of Birth{" "}
+              <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "none" }}>
+                · optional
+              </span>
             </label>
             <input className="field-input" type="date" value={dob}
               onChange={e => { setDob(e.target.value); setErr(""); }}
@@ -307,14 +310,12 @@ export default function StatusTracker({ lang, t, tFull: _tFull }) {
 
           {err && (
             <div style={{ background: "rgba(254,242,242,0.90)", border: "1px solid #FECACA",
-              color: "#DC2626", fontSize: 13, fontWeight: 700,
-              padding: "10px 14px", borderRadius: 12 }}>
+              color: "#DC2626", fontSize: 13, fontWeight: 700, padding: "10px 14px", borderRadius: 12 }}>
               {err}
             </div>
           )}
 
-          <button className="btn-primary" onClick={track} disabled={loading}
-            style={{ margin: 0 }}>
+          <button className="btn-primary" onClick={track} disabled={loading} style={{ margin: 0 }}>
             {loading ? "Searching…" : "Track Appointment"}
           </button>
         </div>
