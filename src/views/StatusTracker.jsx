@@ -91,7 +91,11 @@ function DOBPickerTrack({ value, onChange }) {
     boxShadow:"inset 0 2px 6px rgba(27,43,75,0.05)",
   };
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr", gap:6 }}>
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr 2fr", gap:6 }}>
+      <select value={day} style={S} onChange={e=>{setDay(e.target.value);emit(year,month,e.target.value);}}>
+        <option value="">Day</option>
+        {days.map(d=><option key={d} value={d}>{parseInt(d,10)}</option>)}
+      </select>
       <select value={month} style={S} onChange={e=>{setMonth(e.target.value);emit(year,e.target.value,day);}}>
         <option value="">Month</option>
         {MONTHS.map(([v,l])=><option key={v} value={v}>{l}</option>)}
@@ -99,10 +103,6 @@ function DOBPickerTrack({ value, onChange }) {
       <select value={year} style={S} onChange={e=>{setYear(e.target.value);emit(e.target.value,month,day);}}>
         <option value="">Year</option>
         {years.map(y=><option key={y} value={String(y)}>{y}</option>)}
-      </select>
-      <select value={day} style={S} onChange={e=>{setDay(e.target.value);emit(year,month,e.target.value);}}>
-        <option value="">Day</option>
-        {days.map(d=><option key={d} value={d}>{parseInt(d,10)}</option>)}
       </select>
     </div>
   );

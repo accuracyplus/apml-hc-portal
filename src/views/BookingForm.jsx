@@ -171,14 +171,14 @@ function DOBPicker({ value, onChange, className }) {
   const days = Array.from({ length:daysInMonth }, (_,i) => String(i+1).padStart(2,"0"));
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr", gap:6 }}>
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr 2fr", gap:6 }}>
       {[
+        { val:day,   setter:v => { setDay(v);   emit(year,month,v); },
+          placeholder:"Day",   opts:days.map(d => ({v:d,l:String(parseInt(d,10))})) },
         { val:month, setter:v => { setMonth(v); emit(year,v,day); },
           placeholder:"Month", opts:MONTHS.map(([v,l]) => ({v,l})) },
         { val:year,  setter:v => { setYear(v);  emit(v,month,day); },
           placeholder:"Year",  opts:years.map(y => ({v:String(y),l:String(y)})) },
-        { val:day,   setter:v => { setDay(v);   emit(year,month,v); },
-          placeholder:"Day",   opts:days.map(d => ({v:d,l:String(parseInt(d,10))})) },
       ].map(({ val, setter, placeholder, opts }) => (
         <select key={placeholder} value={val} onChange={e => setter(e.target.value)}
           className={"field-input " + (className||"")}
