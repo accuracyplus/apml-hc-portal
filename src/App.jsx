@@ -47,17 +47,18 @@ export default function App() {
 
           {/* ── Logo area — lighter frosted pill ─────────────────── */}
           <div style={{
-            background: "rgba(255,255,255,0.18)",
+            background: "rgba(255,255,255,0.92)",
             backdropFilter: "blur(8px)",
-            borderRadius: 12,
-            padding: "6px 10px",
+            borderRadius: 10,
+            padding: "6px 12px",
             display: "inline-flex",
             alignItems: "center",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
           }}>
             {/* Text fallback */}
             <div className="brand-text-fallback" id="brand-fallback">
-              <div className="brand-name">Accuracy Plus</div>
-              <div className="brand-sub">Medical Laboratory</div>
+              <div className="brand-name" style={{ color:"#1B4D47" }}>Accuracy Plus</div>
+              <div className="brand-sub" style={{ color:"#3C7871" }}>Medical Laboratory</div>
             </div>
             {/* Logo image */}
             <img
@@ -113,6 +114,7 @@ export default function App() {
           lang={lang}
           t={t}
           onBooked={handleBooked}
+          onShowPrivacy={() => setShowPrivacy(true)}
         />
       )}
 
