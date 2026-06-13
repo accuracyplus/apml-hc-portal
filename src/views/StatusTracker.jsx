@@ -117,6 +117,16 @@ function StatusView({ booking, lang, onBack, onTrackAnother }) {
     && booking.confirmed_date && booking.confirmed_time;
   const showCollector = ["Assigned", "On the Way", "Collected"].includes(booking.status) && driver;
 
+  // Check if appointment time has passed without collection — show "running late" banner
+  const isRunningLate = (() => {
+    if (!["Confirmed","Assigned","On the Way"].includes(booking.status)) return false;
+    const dateStr = booking.confirmed_date || booking.date;
+    const timeStr = booking.confirmed_time || booking.time_slot;
+    if (!dateStr || !timeStr) return false;
+    const apptTime = new Date(dateStr + "T" + timeStr + ":00");
+    return apptTime < new Date();
+  })();
+
   return (
     <div className="portal-page">
       {/* Back */}
@@ -130,6 +140,27 @@ function StatusView({ booking, lang, onBack, onTrackAnother }) {
         </button>
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{booking.id}</span>
       </div>
+
+      {/* ── Running late banner ─────────────────────────────────── */}
+      {isRunningLate && (
+        <div style={{
+          margin:"12px 20px 0",
+          padding:"14px 16px",
+          background:"linear-gradient(135deg,#FEF2F2,#FFF5F5)",
+          border:"1.5px solid #FECACA",
+          borderRadius:16,
+          textAlign:"center",
+        }}>
+          <div style={{ fontSize:28, marginBottom:6 }}>😔</div>
+          <div style={{ fontSize:15, fontWeight:900, color:"#DC2626", marginBottom:4 }}>
+            Oops! We seem to be running late.
+          </div>
+          <div style={{ fontSize:13, color:"#7f1d1d", lineHeight:1.6 }}>
+            We apologise for the delay. Our team will contact you shortly
+            to reschedule or confirm an updated arrival time.
+          </div>
+        </div>
+      )}
 
       {/* ── Animated status illustration ─────────────────────────── */}
       <StatusIllustration status={booking.status} t={ILLUS_T} />
