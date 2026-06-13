@@ -4,11 +4,13 @@
 import { useState } from "react";
 import BookingForm   from "./views/BookingForm.jsx";
 import StatusTracker from "./views/StatusTracker.jsx";
+import PrivacyPage   from "./views/PrivacyPage.jsx";
 import strings       from "./i18n.js";
 
 export default function App() {
   const [lang,      setLang]     = useState("en");
   const [screen,    setScreen]   = useState("book");
+  const [showPrivacy, setShowPrivacy] = useState(false);
   // After submit, store booking so Track tab can pre-load status immediately
   const [liveBooking, setLiveBooking] = useState(null);
 
@@ -32,6 +34,9 @@ export default function App() {
     setLiveBooking(null);
     setScreen("book");
   };
+
+  // Show privacy page full-screen
+  if (showPrivacy) return <PrivacyPage onBack={() => setShowPrivacy(false)} />;
 
   return (
     <div className={"portal-shell" + (isRtl ? " rtl" : "")}>
@@ -123,7 +128,28 @@ export default function App() {
 
       {/* ══ FOOTER ══════════════════════════════════════════════════ */}
       <footer className="portal-footer">
-        © {new Date().getFullYear()} Accuracy Plus Medical Laboratory · DHA Licensed
+        <div style={{ marginBottom:6 }}>
+          © {new Date().getFullYear()} Accuracy Plus Medical Laboratory · DOH Licensed · Abu Dhabi, UAE
+        </div>
+        <div style={{ marginBottom:6 }}>
+          <button onClick={() => setShowPrivacy(true)}
+            style={{ background:"none", border:"none", color:"var(--teal)",
+              fontWeight:700, fontSize:11, cursor:"pointer", fontFamily:"var(--font)",
+              textDecoration:"underline", padding:0 }}>
+            Privacy Notice
+          </button>
+          {" · "}
+          <a href="mailto:info@apml.co"
+            style={{ color:"var(--teal)", fontSize:11, fontWeight:700 }}>
+            Contact Us
+          </a>
+        </div>
+        <div style={{ fontSize:10, color:"var(--text-muted)", lineHeight:1.5 }}>
+          This portal and its contents are the exclusive property of Accuracy Plus
+          Medical Laboratory. Unauthorised reproduction, distribution, or use of
+          this portal or its data is strictly prohibited. For appointment enquiries
+          only — not for emergency medical use.
+        </div>
       </footer>
     </div>
   );
