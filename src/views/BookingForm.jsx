@@ -149,6 +149,48 @@ function DraggableMap({ value, onChange }) {
   );
 }
 
+
+// ── DOBPicker — dropdown month/year/day (faster than calendar on mobile) ─────
+function DOBPicker({ value, onChange, className }) {
+  const parsed = value && /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const [year,  setYear]  = useState(parsed ? parsed[1] : "");
+  const [month, setMonth] = useState(parsed ? parsed[2] : "");
+  const [day,   setDay]   = useState(parsed ? parsed[3] : "");
+
+  const emit = (y, m, d) => onChange(y && m && d ? y+"-"+m+"-"+d : "");
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length:101 }, (_, i) => currentYear - i);
+  const MONTHS = [
+    ["01","Jan"],["02","Feb"],["03","Mar"],["04","Apr"],
+    ["05","May"],["06","Jun"],["07","Jul"],["08","Aug"],
+    ["09","Sep"],["10","Oct"],["11","Nov"],["12","Dec"],
+  ];
+  const daysInMonth = year && month
+    ? new Date(parseInt(year,10), parseInt(month,10), 0).getDate() : 31;
+  const days = Array.from({ length:daysInMonth }, (_,i) => String(i+1).padStart(2,"0"));
+
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr", gap:6 }}>
+      {[
+        { val:month, setter:v => { setMonth(v); emit(year,v,day); },
+          placeholder:"Month", opts:MONTHS.map(([v,l]) => ({v,l})) },
+        { val:year,  setter:v => { setYear(v);  emit(v,month,day); },
+          placeholder:"Year",  opts:years.map(y => ({v:String(y),l:String(y)})) },
+        { val:day,   setter:v => { setDay(v);   emit(year,month,v); },
+          placeholder:"Day",   opts:days.map(d => ({v:d,l:String(parseInt(d,10))})) },
+      ].map(({ val, setter, placeholder, opts }) => (
+        <select key={placeholder} value={val} onChange={e => setter(e.target.value)}
+          className={"field-input " + (className||"")}
+          style={{ padding:"13px 8px", fontSize:13 }}>
+          <option value="">{placeholder}</option>
+          {opts.map(({ v, l }) => <option key={v} value={v}>{l}</option>)}
+        </select>
+      ))}
+    </div>
+  );
+}
+
 export default function BookingForm({ lang, t, onBooked }) {
   const [form,    setForm]    = useState(blank);
   const [errs,    setErrs]    = useState({});
@@ -307,8 +349,7 @@ export default function BookingForm({ lang, t, onBooked }) {
             <label className="field-label">
               Date of Birth <span className="field-label-optional">· optional</span>
             </label>
-            <input className="field-input" type="date" value={form.dob}
-              onChange={e => set("dob", e.target.value)} />
+            <DOBPicker value={form.dob} onChange={v => set("dob", v)} />
           </div>
         </div>
 

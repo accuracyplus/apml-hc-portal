@@ -65,6 +65,49 @@ const STATUS_ILLUS_STRINGS = {
 // tFull-shaped object for StatusIllustration ({ statuses: { [status]: { label, msg, anim } } })
 const ILLUS_T = { statuses: STATUS_ILLUS_STRINGS };
 
+
+// ── DOBPickerTrack ────────────────────────────────────────────────────────────
+function DOBPickerTrack({ value, onChange }) {
+  const parsed = value && /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const [year,  setYear]  = useState(parsed ? parsed[1] : "");
+  const [month, setMonth] = useState(parsed ? parsed[2] : "");
+  const [day,   setDay]   = useState(parsed ? parsed[3] : "");
+  const emit = (y, m, d) => onChange(y && m && d ? y+"-"+m+"-"+d : "");
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length:101 }, (_,i) => currentYear - i);
+  const MONTHS = [
+    ["01","Jan"],["02","Feb"],["03","Mar"],["04","Apr"],
+    ["05","May"],["06","Jun"],["07","Jul"],["08","Aug"],
+    ["09","Sep"],["10","Oct"],["11","Nov"],["12","Dec"],
+  ];
+  const daysInMonth = year && month
+    ? new Date(parseInt(year,10), parseInt(month,10), 0).getDate() : 31;
+  const days = Array.from({ length:daysInMonth }, (_,i) => String(i+1).padStart(2,"0"));
+  const S = {
+    flex:1, padding:"12px 8px", background:"rgba(255,255,255,0.80)",
+    border:"1.5px solid rgba(60,120,113,0.18)", borderRadius:"var(--r-md,14px)",
+    fontFamily:"var(--font)", fontSize:13, color:"var(--text,#1A2E2B)",
+    outline:"none", appearance:"auto", cursor:"pointer", minWidth:0,
+    boxShadow:"inset 0 2px 6px rgba(27,43,75,0.05)",
+  };
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"2fr 2fr 1fr", gap:6 }}>
+      <select value={month} style={S} onChange={e=>{setMonth(e.target.value);emit(year,e.target.value,day);}}>
+        <option value="">Month</option>
+        {MONTHS.map(([v,l])=><option key={v} value={v}>{l}</option>)}
+      </select>
+      <select value={year} style={S} onChange={e=>{setYear(e.target.value);emit(e.target.value,month,day);}}>
+        <option value="">Year</option>
+        {years.map(y=><option key={y} value={String(y)}>{y}</option>)}
+      </select>
+      <select value={day} style={S} onChange={e=>{setDay(e.target.value);emit(year,month,e.target.value);}}>
+        <option value="">Day</option>
+        {days.map(d=><option key={d} value={d}>{parseInt(d,10)}</option>)}
+      </select>
+    </div>
+  );
+}
+
 function StatusView({ booking, lang, onBack, onTrackAnother }) {
   const cd = useCountdown(booking.confirmed_date, booking.confirmed_time);
   const driver = booking.driver || booking.phlebotomist || "";
@@ -182,7 +225,8 @@ export default function StatusTracker({ lang, t, tFull: _tFull, directBooking })
   const track = async () => {
     const p = normalizePhone(code, phone);
     const n = name.trim().split(" ")[0].toLowerCase();
-    if (!p || !n) { setErr("Please enter your mobile number and first name"); return; }
+    if (!p || !n)  { setErr("Please enter your mobile number and first name"); return; }
+    if (!dob)      { setErr("Date of birth is required to protect your privacy"); return; }
     setLoading(true); setErr(""); setBooking(null); setMultiple(null);
     try {
       const params = new URLSearchParams({ phone: p, name: n });
@@ -298,14 +342,11 @@ export default function StatusTracker({ lang, t, tFull: _tFull, directBooking })
           <div>
             <label style={{ fontSize: 11, fontWeight: 800, color: "var(--teal-600)",
               textTransform: "uppercase", letterSpacing: "0.09em", display: "block", marginBottom: 6 }}>
-              Date of Birth{" "}
-              <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "none" }}>
-                · optional
-              </span>
+              Date of Birth <span style={{ color:"var(--error,#dc2626)", fontSize:11 }}>*</span>
+              <span style={{ fontSize: 10, fontWeight: 500, color: "var(--text-muted)", textTransform: "none",
+                marginLeft:4 }}>· required for privacy</span>
             </label>
-            <input className="field-input" type="date" value={dob}
-              onChange={e => { setDob(e.target.value); setErr(""); }}
-              style={{ margin: 0, background: "rgba(255,255,255,0.80)" }} />
+            <DOBPickerTrack value={dob} onChange={v => { setDob(v); setErr(""); }} />
           </div>
 
           {err && (
