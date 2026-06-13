@@ -191,7 +191,7 @@ function DOBPicker({ value, onChange, className }) {
   );
 }
 
-export default function BookingForm({ lang, t, onBooked }) {
+export default function BookingForm({ lang, t, onBooked, onShowPrivacy }) {
   const [form,    setForm]    = useState(blank);
   const [errs,    setErrs]    = useState({});
   const [busy,    setBusy]    = useState(false);
@@ -455,10 +455,14 @@ export default function BookingForm({ lang, t, onBooked }) {
             />
             <span style={{ fontSize: 12, color: "var(--text-mid)", lineHeight: 1.6 }}>
               I confirm that I have read and agree to the{" "}
-              <a href="/privacy" target="_blank" rel="noreferrer"
-                style={{ color: "var(--teal)", fontWeight: 700 }}>
+              <button type="button"
+                onClick={() => onShowPrivacy && onShowPrivacy()}
+                style={{ background:"none", border:"none", padding:0,
+                  color:"var(--teal)", fontWeight:700, fontSize:12,
+                  cursor:"pointer", fontFamily:"var(--font)",
+                  textDecoration:"underline" }}>
                 Privacy Notice
-              </a>
+              </button>
               . My personal information will be used solely to process this home collection
               appointment. <em>(Required under UAE PDPL)</em>
             </span>
