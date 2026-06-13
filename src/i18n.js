@@ -134,16 +134,16 @@ export function t(key, lang = "en") {
   return strings[lang]?.[key] ?? strings.en?.[key] ?? key;
 }
 
-// Background colours used by StatusIllustration.jsx
+// Background colours used by StatusIllustration.jsx — teal theme
 export const STATUS_BG = {
-  "Requested":    "#E0F2FE",
-  "Confirmed":    "#DCFCE7",
-  "Assigned":     "#EDE9FF",
-  "On the Way":   "#FEF3C7",
-  "Collected":    "#CCFBF1",
-  "Processing":   "#DBEAFE",
-  "Report Ready": "#FEF9C3",
-  "Cancelled":    "#F1F5F9",
+  "Requested":    "#EDF6F4",   // teal-50
+  "Confirmed":    "#DCFCE7",   // green (positive — keep)
+  "Assigned":     "#D6EEEB",   // teal-100
+  "On the Way":   "#FEF3C7",   // amber (movement — keep)
+  "Collected":    "#D6EEEB",   // teal-100
+  "Processing":   "#EDF6F4",   // teal-50
+  "Report Ready": "#FEF9C3",   // yellow (result — keep)
+  "Cancelled":    "#F1F5F9",   // grey (keep)
 };
 
 export default strings;
