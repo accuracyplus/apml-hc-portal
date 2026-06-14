@@ -1,7 +1,7 @@
 // App.jsx — Accuracy Plus Home Collection
 // Logo: upload your 480×150 banner as portal/public/logo.png
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BookingForm   from "./views/BookingForm.jsx";
 import StatusTracker from "./views/StatusTracker.jsx";
 import PrivacyPage   from "./views/PrivacyPage.jsx";
@@ -11,6 +11,10 @@ export default function App() {
   const [lang,      setLang]     = useState("en");
   const [screen,    setScreen]   = useState("book");
   const [showPrivacy, setShowPrivacy] = useState(false);
+  // Splash video — shown once per session on initial load
+  const [showSplash, setShowSplash] = useState(() => {
+    try { return !sessionStorage.getItem("apml-splash-shown"); } catch { return true; }
+  });
   // After submit, store booking so Track tab can pre-load status immediately
   const [liveBooking, setLiveBooking] = useState(null);
 
@@ -37,6 +41,29 @@ export default function App() {
 
   // Show privacy page full-screen
   if (showPrivacy) return <PrivacyPage onBack={() => setShowPrivacy(false)} />;
+
+  // Splash video — shown once per session
+  if (showSplash) {
+    const dismiss = () => {
+      try { sessionStorage.setItem("apml-splash-shown", "1"); } catch {}
+      setShowSplash(false);
+    };
+    return (
+      <div style={{
+        position:"fixed", inset:0, background:"#000",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        zIndex:9999,
+      }} onClick={dismiss}>
+        <video
+          src="/splash.mp4"
+          autoPlay muted playsInline
+          onEnded={dismiss}
+          onError={dismiss}
+          style={{ maxWidth:"100%", maxHeight:"100dvh", objectFit:"contain" }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={"portal-shell" + (isRtl ? " rtl" : "")}>
@@ -141,7 +168,7 @@ export default function App() {
             Privacy Notice
           </button>
           {" · "}
-          <a href="mailto:info@apml.co"
+          <a href="mailto:support@apml.co"
             style={{ color:"var(--teal)", fontSize:11, fontWeight:700 }}>
             Contact Us
           </a>
