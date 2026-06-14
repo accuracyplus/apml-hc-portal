@@ -364,6 +364,7 @@ export default function BookingForm({ lang, t, onBooked, onShowPrivacy }) {
                 className={"field-input" + (errs.preferred_date ? " error" : "")}
                 type="date" value={form.preferred_date} min={todayISO()}
                 onChange={e => { if (e.target.value >= todayISO()) set("preferred_date", e.target.value); }}
+                style={{ minHeight:48, WebkitAppearance:"none", appearance:"none" }}
               />
               {errs.preferred_date && (
                 <div className="field-error" style={{ fontSize: 10 }}>{errs.preferred_date}</div>
