@@ -100,10 +100,12 @@ export default function PrivacyPage({ onBack }) {
             background:"rgba(60,120,113,0.08)", borderRadius:12,
             border:"1px solid rgba(60,120,113,0.15)" }}>
             <div><strong>Accuracy Plus Medical Laboratory</strong></div>
-            <div>Email: <a href="mailto:info@apml.co"
-              style={{ color:"#3C7871", fontWeight:700 }}>info@apml.co</a></div>
-            <div>Phone: <a href="tel:+97126726466"
-              style={{ color:"#3C7871", fontWeight:700 }}>+971 2 672 6466</a></div>
+            <div>Email: <a href="mailto:support@apml.co"
+              style={{ color:"#3C7871", fontWeight:700 }}>support@apml.co</a></div>
+            <div>Landline: <a href="tel:+97126333923"
+              style={{ color:"#3C7871", fontWeight:700 }}>+971 2 633 3923</a></div>
+            <div>Mobile/WhatsApp: <a href="tel:+971542346392"
+              style={{ color:"#3C7871", fontWeight:700 }}>+971 54 234 6392</a></div>
             <div>Abu Dhabi, UAE · DOH Licensed</div>
           </div>
         </Section>

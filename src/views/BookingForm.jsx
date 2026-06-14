@@ -280,21 +280,12 @@ export default function BookingForm({ lang, t, onBooked, onShowPrivacy }) {
   return (
     <div className={isRtl ? "rtl" : "ltr"} style={{ minHeight: "100dvh" }}>
 
-      {/* ── Teal Hero Header ──────────────────────────────────────────── */}
+      {/* ── Light intro strip — "Home Collection" already shown in App header ── */}
       <div style={{
-        background: "linear-gradient(135deg, var(--teal-900) 0%, var(--teal-700) 55%, var(--teal-500) 100%)",
-        padding: "max(52px, calc(env(safe-area-inset-top, 0px) + 36px)) var(--sp-10) var(--sp-10)",
-        boxShadow: "0 6px 32px rgba(27,77,71,0.28)",
+        padding: "var(--sp-6) var(--sp-10) var(--sp-4)",
       }}>
-        <div style={{ marginBottom: 6 }}>
-          <span className="hc-badge">Home Collection</span>
-        </div>
-        <h1 style={{
-          margin: 0, fontSize: 28, fontWeight: 900, color: "#fff",
-          letterSpacing: "-0.02em", lineHeight: 1.15,
-        }}>Book a Sample Collection</h1>
         <p style={{
-          margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,0.72)",
+          margin: 0, fontSize: 14, color: "var(--text-muted)",
           fontWeight: 500, lineHeight: 1.5,
         }}>
           We&apos;ll come to you — fast, safe, at-home testing.
@@ -364,7 +355,11 @@ export default function BookingForm({ lang, t, onBooked, onShowPrivacy }) {
                 className={"field-input" + (errs.preferred_date ? " error" : "")}
                 type="date" value={form.preferred_date} min={todayISO()}
                 onChange={e => { if (e.target.value >= todayISO()) set("preferred_date", e.target.value); }}
-                style={{ minHeight:48, WebkitAppearance:"none", appearance:"none" }}
+                style={{
+                  minHeight:48, WebkitAppearance:"none", appearance:"none",
+                  boxSizing:"border-box", width:"100%",
+                  border:"1.5px solid rgba(60,120,113,0.18)",
+                }}
               />
               {errs.preferred_date && (
                 <div className="field-error" style={{ fontSize: 10 }}>{errs.preferred_date}</div>
